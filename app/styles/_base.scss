@@ -1,3 +1,24 @@
+*, *:after, *:before {
+    box-sizing: border-box;
+}
+
+:root {
+    font-size: 18px;
+}
+
 body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    margin: 0;
+    width: 100vw;
+
+    font-family: $primary-font;
+
+    // fade to white
     
+}
+
+input {
+    outline: none;
 }
