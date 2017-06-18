@@ -22,6 +22,13 @@
     @include breakpoint(max-width 550px) { font-size: 14px; }
 
     // List Labelings
+    @keyframes labelEntrance {
+        from {
+            transform: translateX(-150px);
+            opacity: 0;
+        }
+    }
+
     &__todo:before, &__finished:before, &__add:before {
         @extend .label;
         @extend .label--large;
@@ -34,6 +41,7 @@
         right: 100%; 
 
         white-space: nowrap;
+        animation: labelEntrance 0.5s;
 
         @include breakpoint(max-width 880px) {
             position: relative;
@@ -41,57 +49,69 @@
             left: 0;
             background: white;
             padding: 0.5rem 0;
+            margin: 0.5rem 0;
         }
-    }
-
-    // Add New Task
-    &__add {
-        position: relative; 
-
-        &:before { 
-            content: 'To Do'; 
-            font-family: $primary-font;
-            font-size: ms(3);
-            font-weight: bold;
-            text-transform: capitalize;
-        }
-    }
-
-    // To Do List
-    &__todo {
-        margin: ms(4) 0;
-        position: relative;
-
-        &:before { content: 'To Be Done'; }
-    }
-
-    // Finished List
-    &__finished {
-        position: relative;
-
-        &:before { content: 'Finished'; }
     }
 
     // Item
-    &__item {
-        margin: ms(2) 0;
-        display: flex;
+    @keyframes itemIn {
+        from {
+            opacity: 0;
+        }
     }
 
-    &__item--finished {
-        .todo__checkbox { background: #A3DCBB; border: none; }
-        
-        @for $i from 1 through 5 {
-            &:nth-child(#{$i}) {
-                .todo__title, .label { opacity: 0.9 - $i/10; }
+    @keyframes titleIn {
+        from {
+            transform: translateX(150px);
+        }
+    }
+
+    @keyframes checkboxIn {
+        from {
+            
+        }
+    }
+    
+    &__item {
+        display: flex;
+        width: 100%;
+        margin-bottom: ms(2);
+
+        transition: all 0.6s;
+        animation: itemIn 0.6s;
+
+        &:hover {
+            cursor: pointer;
+
+            .todo__checkbox { 
+                background: #D9D9D9; 
+            }
+
+            .todo__title {
+                transform: translateX(8px);
+                opacity: 0.8;
             }
         }
     }
 
+    &__item--finished {
+        .todo__checkbox { background: #A3DCBB !important; border: none; }
+        
+        .todo__title, .label { opacity: 0.7; }
+    }
+
     &__title {
+        max-width: 500px;
         margin: 0;
+        
+        line-height: 1.4;
         font-size: ms(2);
         color: #636363;
+
+        animation: titleIn 0.6s;
+        transition: all 0.3s;
+
+        overflow: hidden;
     }
 
     &__checkbox {
@@ -103,6 +123,9 @@
 
         border: 2px solid #D9D9D9;
         border-radius: 100%;
+
+        animation: checkboxIn 0.5s;
+        transition: all 0.2s;
         
         &:before {
             content: '';
@@ -130,6 +153,25 @@
         background: #EFEFEF;
     }
 
+    // Add New Task
+    &__add {
+        position: relative; 
+
+        &:before { 
+            content: 'To Do'; 
+            font-family: $primary-font;
+            font-size: ms(3);
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        &:hover { 
+            .todo__title {
+                transform: scale(1); 
+            }
+        }
+    }
+
     // Input
     &__input {
         @extend .todo__title;
@@ -141,5 +183,36 @@
         padding-bottom: ms(-3);
         margin-bottom: ms(-6);
         border-bottom: 1px solid #E1E1E1;
+
+        opacity: 0.5;
+        &:focus {
+            opacity: 1;
+        }
     } 
+
+    // To Do List
+    &__todo {
+        &:before { 
+            content: 'To Be Done'; 
+        }
+    }
+
+    // Finished List
+    &__finished {
+        position: relative;
+
+        &:before { content: 'Finished'; }
+    }
+
+    &__todo, &__finished {
+        margin: ms(4) 0;
+        position: relative;
+
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column-reverse;
+
+        &:before { order: 1; }
+        .todo__item:first-child { margin: 0; }
+    }
 }

@@ -5,13 +5,19 @@ require('styles/main.scss');
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-var Todo_item = (props) => {
-    return (
-        <div className="todo__item">
-            <span className="todo__checkbox"></span>
-            <p className="todo__title">{ props.value } <span className="label">Added { props.date }</span></p>
-        </div>
-    );
+class Todo_item extends React.Component {
+    updateTask() {
+        this.props.updateTasks(this.props.value);
+    }
+
+    render() {
+        return (
+            <div className={"todo__item " + (this.props.finished ? 'todo__item--finished' : '') } onClick={ this.updateTask.bind(this) }>
+                <span className="todo__checkbox"></span>
+                <p className="todo__title">{ this.props.value } <span className="label">Added { this.props.date }</span></p>
+            </div>
+        );
+    }
 };      
 
 class Todo_add extends React.Component {
@@ -28,7 +34,10 @@ class Todo_add extends React.Component {
 
     submitTask(e) {
         e.preventDefault(); 
-        this.props.addTask(this.state.value, this.state.date);
+        if (!this.state.value.match(/^\s*$/)) {
+            this.props.addTask(this.state.value, this.state.date);
+        }
+        this.setState({ value: '' });
     }
 
     handleTask(e) {
@@ -44,7 +53,7 @@ class Todo_add extends React.Component {
                     <form onSubmit={this.submitTask.bind(this)}> 
                         <input className="todo__input" type="text" placeholder="What needs to be done?" 
                         value={this.state.value} onChange={this.handleTask}/>
-                        <span className="label">+ Add a new task</span>
+                        <span className="label">Add a new task +</span>
                     </form>
 
                 </div>
@@ -52,24 +61,42 @@ class Todo_add extends React.Component {
         );
     }
 }
+ 
+class Todo_todo extends React.Component {
+    updateTasks(val) {
+        this.props.updateTodo(val);
+    }
 
-var Todo_todo = (props) => {
-    return (
-        <div className="todo__todo">
-            {
-                props.tasks.map((obj) => {
-                    return <Todo_item key={obj.value} value={obj.value} date={obj.date}/>;
-                })
-            }                
-        </div>
-    );
+    render() {
+        if (this.props.tasks.length < 1) { return null; }
+
+        return (
+            <div className="todo__todo">
+                {
+                    this.props.tasks.map((obj, i) => {
+                        return <Todo_item key={obj.value} value={obj.value} date={obj.date} done={obj.done} updateTasks={(val) => this.updateTasks(val)}/>;
+                    })
+                }                
+            </div>
+        );
+    }
 }
 
 class Todo_finished extends React.Component {
+    updateTasks(val) {
+        this.props.updateFinished(val);
+    }
+
     render() {
+        if (this.props.tasks.length < 1) { return null; }
+
         return (
             <div className="todo__finished">
-                <Todo_item/>            
+                {
+                    this.props.tasks.map((obj, i) => {
+                        return <Todo_item finished={true} key={obj.value} value={obj.value} date={obj.date} done={obj.done} updateTasks={(val) => this.updateTasks(val)}/>;
+                    })
+                }                
             </div>
         );
     }
@@ -86,7 +113,7 @@ class Todo extends React.Component {
     }
 
     addTask(val, date) {
-        var task = {
+        let task = {
             value: val,
             date: date
         };
@@ -96,14 +123,44 @@ class Todo extends React.Component {
         });
     }
 
+    updateTodo(val) {
+        let todo = this.state.todo.filter((obj) => {
+            return obj.value !== val;
+        });
+
+        let finished = this.state.todo.filter((obj) => {
+            return obj.value === val;
+        });
+        
+        this.setState({
+            todo: todo,
+            finished: this.state.finished.concat(finished) 
+        });
+    }
+
+    updateFinished(val) {
+        let finished = this.state.finished.filter((obj) => {
+            return obj.value !== val;
+        });
+
+        let todo = this.state.finished.filter((obj) => {
+            return obj.value === val;
+        });
+
+        this.setState({
+            todo: this.state.todo.concat(todo),
+            finished: finished 
+        });
+    }
+
     render() {
         return (
              <div className="todo">
                 <Todo_add addTask={(val, date) => this.addTask(val, date)} />
                
-                <Todo_todo tasks={this.state.todo}/>
+                <Todo_todo tasks={this.state.todo} updateTodo={(val) => this.updateTodo(val)}/>
 
-                <Todo_finished tasks={this.state.finished}/>
+                <Todo_finished tasks={this.state.finished} updateFinished={(val) => this.updateFinished(val)}/>
             </div>
         );
     }
