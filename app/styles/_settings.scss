@@ -1,0 +1,19 @@
+// Libs
+@import '../../bower_components/normalize-css/normalize.css';
+@import '../../bower_components/modular-scale/stylesheets/modularscale';
+@import '../../bower_components/breakpoint-sass/stylesheets/breakpoint';
+
+// Google Fonts
+@import url('https://fonts.googleapis.com/css?family=Karla|Open+Sans:300,600');
+
+// Typography
+
+$modularscale: (
+    base: 1em,
+    ratio: 1.25
+);
+
+$primary-font: 'Open Sans';
+$secondary-font: 'Karla';
+
+
